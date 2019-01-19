@@ -4,10 +4,7 @@
   "description": "A simple customizable countdown component for React Native",
   "main": "index.js",
   "scripts": {
-    "lint": "tslint --project tsconfig.json --format stylish",
-    "ci": "npm run type-check && npm run lint && npm run prettier",
-    "build": "npm run ci && tsc",
-    "prettier": "prettier --write '**/*.{ts,tsx,js}' --config .prettierrc"
+    "lint": "tslint --project tsconfig.json --format stylish"
   },
   "repository": {
     "type": "git",
@@ -36,7 +33,6 @@
     "@types/react": "^16.0.5",
     "@types/react-dom": "16.0.3",
     "@types/react-native": "^0.56.4",
-    "prettier": "1.13.7",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.14.0",
     "tslint-eslint-rules": "^5.3.1",

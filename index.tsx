@@ -12,11 +12,14 @@ import { Text } from 'react-native';
  */
 
 interface ITimerCountdownProps {
+  addSeconds: ((seconds: number) => void)
   initialSecondsRemaining: number;
   interval?: number;
   formatSecondsRemaining?: (milliseconds: number) => string;
+  paused: boolean
   onTick?: (secondsRemaining: number) => void;
   onTimeElapsed?: () => void;
+  removeSeconds: ((seconds: number) => void)
   allowFontScaling?: boolean;
   style?: object;
 }
@@ -24,10 +27,53 @@ interface ITimerCountdownProps {
 export default class TimerCountdown extends React.Component<ITimerCountdownProps> {
   private mounted: boolean = false;
   public readonly state = {
+    paused: false,
     secondsRemaining: this.props.initialSecondsRemaining,
     timeoutId: null,
     previousSeconds: null
   };
+
+  public addSeconds = (seconds: number) => {
+    let secondsRemaining = this.state.secondsRemaining
+    secondsRemaining = secondsRemaining + (seconds * 1000)
+    clearTimeout(this.state.timeoutId);
+    this.setState({ secondsRemaining, timeOutId: null },
+      () => {
+        if (!this.props.paused) {
+          this.tick()
+        } else {
+          return null
+        }
+      })
+  }
+
+  public getTimeLeft = () => {
+    const secondsRemaining: number = this.state.secondsRemaining;
+    return this.getFormattedTime(secondsRemaining)
+  }
+
+
+  public removeSeconds = (seconds: number) => {
+    let secondsRemaining = this.state.secondsRemaining
+    secondsRemaining = secondsRemaining - (seconds * 1000)
+    clearTimeout(this.state.timeoutId)
+    this.setState({ secondsRemaining, timeOutId: null },
+      () => {
+        if (!this.props.paused) {
+          this.tick()
+        } else {
+          return null
+        }
+      })
+  }
+
+  public togglePause = (paused: boolean) => {
+    if (paused) {
+      console.log('should pause')
+    } else {
+      console.log('should start')
+    }
+  }
 
   public componentDidMount(): void {
     this.mounted = true;
@@ -35,17 +81,23 @@ export default class TimerCountdown extends React.Component<ITimerCountdownProps
   }
 
   public componentWillReceiveProps(newProps): void {
-    if (this.state.timeoutId) {
-      clearTimeout(this.state.timeoutId);
+    if (this.props.paused !== newProps.paused) {
+      this.togglePause(newProps.paused)
     }
-    this.setState({
-      previousSeconds: null,
-      secondsRemaining: newProps.initialSecondsRemaining
-    });
+    else {
+      if (this.state.timeoutId) {
+        clearTimeout(this.state.timeoutId);
+      }
+      this.setState({
+        previousSeconds: null,
+        secondsRemaining: newProps.initialSecondsRemaining
+      });
+    }
+
   }
 
   public componentDidUpdate(): void {
-    if (!this.state.previousSeconds && this.state.secondsRemaining > 0 && this.mounted) {
+    if (!this.state.previousSeconds && this.state.secondsRemaining > 0 && this.mounted && !this.props.paused) {
       this.tick();
     }
   }
